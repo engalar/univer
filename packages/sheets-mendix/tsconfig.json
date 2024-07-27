@@ -1,9 +1,18 @@
 {
     "extends": "@univerjs/shared/tsconfigs/base",
     "compilerOptions": {
-        "rootDir": "src",
+        "rootDir": "./",
         "outDir": "lib/types"
     },
-    "references": [{ "path": "./tsconfig.node.json" }],
-    "include": ["src"]
+    "references": [
+        {
+            "path": "./tsconfig.node.json"
+        }
+    ],
+    "include": [
+        "src",
+        "demo",
+        "vite.config.ts",
+        "vite.dev.config.ts"
+    ]
 }

@@ -14,4 +14,6 @@
  * limitations under the License.
  */
 
-export * from './sheets-mendix-plugin';
+export * from './plugin';
+export * from './services/customer.service';
+export * from './services/consumer.service';

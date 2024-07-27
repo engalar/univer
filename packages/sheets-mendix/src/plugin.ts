@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { Injector, Plugin, UniverInstanceType } from '@univerjs/core';
-import { Inject } from '@wendellhu/redi';
-import { CustomerService, ICustomerService } from './services/customer.service';
+import { Inject, Injector, Plugin, UniverInstanceType } from '@univerjs/core';
+import { CustomerService } from './services/customer.service';
+import { ConsumerService } from './services/consumer.service';
 
 export class SheetsMendixPlugin extends Plugin {
     static override pluginName = 'SHEETS_MENDIX_PLUGIN';
@@ -30,6 +30,7 @@ export class SheetsMendixPlugin extends Plugin {
     }
 
     override onStarting(injector: Injector): void {
-        injector.add([ICustomerService, { useClass: CustomerService }]);
+        injector.add([CustomerService]);
+        injector.add([ConsumerService]);
     }
 }

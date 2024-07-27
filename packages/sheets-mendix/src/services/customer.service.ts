@@ -14,22 +14,21 @@
  * limitations under the License.
  */
 
-import type { IDisposable } from '@univerjs/core';
-import { createIdentifier, IResourceManagerService, LifecycleStages, OnLifecycle, UniverInstanceType } from '@univerjs/core';
-import { Inject } from '@wendellhu/redi';
+import { Inject, IResourceManagerService, LifecycleStages, OnLifecycle, UniverInstanceType } from '@univerjs/core';
 
 interface IResource { testResource: string }
-export interface ICustomerService {
-}
-export const ICustomerService = createIdentifier<CustomerService>('sheets-mendix.customer-service');
 
-@OnLifecycle(LifecycleStages.Starting, ICustomerService)
-export class CustomerService implements ICustomerService, IDisposable {
+@OnLifecycle(LifecycleStages.Starting, CustomerService)
+export class CustomerService {
     private _model: IResource = { testResource: '' };
 
     constructor(
         @Inject(IResourceManagerService) private _resourceManagerService: IResourceManagerService
     ) {
+        this._init();
+    }
+
+    private _init() {
         this._resourceManagerService.registerPluginResource<IResource>({
             toJson: (unitID) => this._toJson(unitID),
             parseJson: (json) => this._parseJson(json),
@@ -42,10 +41,6 @@ export class CustomerService implements ICustomerService, IDisposable {
                 this._model = { testResource: '' };
             },
         });
-    }
-
-    dispose(): void {
-        this._model = { testResource: '' };
     }
 
     private _toJson(_unitID: string) {
