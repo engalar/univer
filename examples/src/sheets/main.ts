@@ -48,6 +48,7 @@ import { UniverSheetsSortUIPlugin } from '@univerjs/sheets-sort-ui';
 import { UniverSheetsDrawingUIPlugin } from '@univerjs/sheets-drawing-ui';
 import { enUS, ruRU, viVN, zhCN, zhTW } from '../locales';
 import { DEFAULT_WORKBOOK_DATA_DEMO } from '../data/sheets/demo/default-workbook-data-demo';
+import { MyPlugin } from './plugin';
 /* eslint-disable-next-line node/prefer-global/process */
 const IS_E2E: boolean = !!process.env.IS_E2E;
 
@@ -128,6 +129,7 @@ class CustomMentionDataService implements IThreadCommentMentionDataService {
 // comment
 univer.registerPlugin(UniverThreadCommentUIPlugin, { overrides: [[IThreadCommentMentionDataService, { useClass: CustomMentionDataService }]] });
 univer.registerPlugin(UniverSheetsThreadCommentPlugin);
+univer.registerPlugin(MyPlugin);
 
 // debugger plugin
 univer.registerPlugin(UniverDebuggerPlugin);
