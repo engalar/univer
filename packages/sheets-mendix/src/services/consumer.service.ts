@@ -14,20 +14,43 @@
  * limitations under the License.
  */
 
-import type { Workbook } from '@univerjs/core';
-import { Inject, IResourceLoaderService, IUniverInstanceService, LifecycleStages, OnLifecycle, UniverInstanceType } from '@univerjs/core';
+import type { ICellData, Nullable, Workbook } from '@univerjs/core';
+import { Inject, Injector, IResourceLoaderService, IUniverInstanceService, LifecycleStages, OnLifecycle, UniverInstanceType } from '@univerjs/core';
+import type { ISheetLocation } from '@univerjs/sheets';
+import { INTERCEPTOR_POINT, SheetInterceptorService } from '@univerjs/sheets';
 
-@OnLifecycle(LifecycleStages.Steady, ConsumerService)
+@OnLifecycle(LifecycleStages.Starting, ConsumerService)
 export class ConsumerService {
     constructor(
         @Inject(IResourceLoaderService) private _resourceLoaderService: IResourceLoaderService,
-        @Inject(IUniverInstanceService) private _univerInstanceService: IUniverInstanceService
-
+        @Inject(IUniverInstanceService) private _univerInstanceService: IUniverInstanceService, @Inject(Injector) private _injector: Injector
     ) {
+        this._init();
+    }
+
+    private _init() {
+        this._interceptorForCell();
+        this._interceptorForResouce();
+    }
+
+    private _interceptorForResouce() {
         const workbook = this._univerInstanceService.getCurrentUnitForType<Workbook>(UniverInstanceType.UNIVER_SHEET);
         if (workbook) {
             const snapshot = this._resourceLoaderService.saveWorkbook(workbook);
             console.error(snapshot);
         }
+    }
+
+    private _interceptorForCell() {
+        this._injector.get(SheetInterceptorService).intercept(INTERCEPTOR_POINT.CELL_CONTENT, {
+            priority: 100,
+            handler(_cell, location: ISheetLocation, next: (v: Nullable<ICellData>) => Nullable<ICellData>) {
+                if (location.row === 0 && location.col === 0) {
+                    return next({ v: 'intercepted' });
+                }
+
+                return next();
+            },
+        });
     }
 }
