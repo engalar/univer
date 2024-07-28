@@ -42,14 +42,34 @@ export class ConsumerService {
     }
 
     private _interceptorForCell() {
-        this._injector.get(SheetInterceptorService).intercept(INTERCEPTOR_POINT.CELL_CONTENT, {
+        const sis = this._injector.get(SheetInterceptorService);
+        sis.intercept(INTERCEPTOR_POINT.CELL_CONTENT, {
             priority: 100,
             handler(_cell, location: ISheetLocation, next: (v: Nullable<ICellData>) => Nullable<ICellData>) {
                 if (location.row === 0 && location.col === 0) {
-                    return next({ v: 'intercepted' });
+                    return next({ v: 'id' });
+                }
+                if (location.row === 0 && location.col === 1) {
+                    return next({ v: 'name' });
+                }
+                if (location.col === 0 && location.row > 0 && location.row < 10) {
+                    return next({ v: `row${location.row}` });
+                }
+                if (location.col === 1 && location.row > 0 && location.row < 10) {
+                    return next({ v: `name-${location.row}` });
                 }
 
                 return next();
+            },
+        });
+
+        sis.intercept(INTERCEPTOR_POINT.ROW_FILTERED, {
+            priority: 100,
+            handler(isFilter, location, next) {
+                if (location.row === 8) {
+                    return true;
+                }
+                return next(isFilter);
             },
         });
     }
