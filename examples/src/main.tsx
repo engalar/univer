@@ -35,6 +35,9 @@ console.table({
 
 function Examples() {
     const demos = [{
+        title: '🎨 Mendix',
+        href: './mendix/',
+    }, {
         title: '📊 Sheets',
         href: './sheets/',
     }, {

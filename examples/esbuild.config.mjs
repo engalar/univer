@@ -72,6 +72,7 @@ const ctx = await esbuild[args.watch ? 'context' : 'build']({
         './src/main.tsx',
 
         // sheets
+        './src/mendix/main.ts',
         './src/sheets/main.ts',
         './src/sheets/worker.ts',
 

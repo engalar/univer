@@ -1,18 +1,65 @@
 {
-    "name": "univer-examples",
-    "private": true,
-    "description": "Univer vanilla ts demo project",
+    "name": "@engalar/univer-sheets-mendix",
+    "version": "0.0.1",
+    "private": false,
+    "description": "",
     "author": "DreamNum <developer@univer.ai>",
-    "license": "Apache-2.0",
-    "scripts": {
-        "build:demo": "node ./esbuild.config.mjs",
-        "dev:demo": "node ./esbuild.config.mjs --watch",
-        "dev:e2e": "node ./esbuild.config.mjs --watch --e2e",
-        "build:e2e": "node ./esbuild.config.mjs --e2e",
-        "lint:types": "node ./scripts/generate-locales.mjs && tsc --noEmit"
+    "license": "",
+    "funding": {
+        "type": "opencollective",
+        "url": "https://opencollective.com/univer"
     },
-    "dependencies": {
-        "@engalar/univer-sheets-mendix": "workspace:*",
+    "homepage": "https://univer.ai",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/dream-num/univer"
+    },
+    "bugs": {
+        "url": "https://github.com/dream-num/univer/issues"
+    },
+    "keywords": [],
+    "exports": {
+        ".": "./src/index.ts",
+        "./*": "./src/*"
+    },
+    "main": "./lib/cjs/index.js",
+    "module": "./lib/es/index.js",
+    "types": "./lib/types/index.d.ts",
+    "publishConfig": {
+        "access": "public",
+        "main": "./lib/cjs/index.js",
+        "module": "./lib/es/index.js",
+        "exports": {
+            ".": {
+                "import": "./lib/es/index.js",
+                "require": "./lib/cjs/index.js",
+                "types": "./lib/types/index.d.ts"
+            },
+            "./*": {
+                "import": "./lib/es/*",
+                "require": "./lib/cjs/*",
+                "types": "./lib/types/index.d.ts"
+            },
+            "./lib/*": "./lib/*"
+        }
+    },
+    "directories": {
+        "lib": "lib"
+    },
+    "files": [
+        "lib"
+    ],
+    "scripts": {
+        "test": "vitest run",
+        "test:watch": "vitest",
+        "coverage": "vitest run --coverage",
+        "build": "tsc && vite build"
+    },
+    "peerDependencies": {
+        "@univerjs/core": "workspace:*",
+        "@univerjs/sheets": "workspace:*"
+    },
+    "devDependencies": {
         "@univerjs/core": "workspace:*",
         "@univerjs/data-validation": "workspace:*",
         "@univerjs/debugger": "workspace:*",
@@ -33,6 +80,7 @@
         "@univerjs/find-replace": "workspace:*",
         "@univerjs/icons": "^0.1.65",
         "@univerjs/rpc": "workspace:*",
+        "@univerjs/shared": "workspace:*",
         "@univerjs/sheets": "workspace:*",
         "@univerjs/sheets-conditional-formatting": "workspace:*",
         "@univerjs/sheets-conditional-formatting-ui": "workspace:*",
@@ -60,24 +108,32 @@
         "@univerjs/uni-formula": "workspace:*",
         "@univerjs/uniscript": "workspace:*",
         "@univerjs/uniui": "workspace:*",
+        "@univerjs/vite-plugin": "^0.5.0",
+        "@vitest/coverage-istanbul": "^1.6.0",
+        "@wendellhu/redi": "0.16.0",
         "clsx": "^2.1.1",
         "monaco-editor": "0.50.0",
         "react": "18.3.1",
         "react-dom": "18.3.1",
         "react-mosaic-component": "^6.1.0",
-        "rxjs": "^7.8.1"
+        "rxjs": "^7.8.1",
+        "typescript": "^5.4.5",
+        "vite": "^5.2.11",
+        "vite-plugin-dts": "^3.9.1",
+        "vite-plugin-externals": "^0.6.2",
+        "vitest": "^1.6.0"
     },
-    "devDependencies": {
-        "@types/react": "^18.3.3",
-        "@types/react-dom": "^18.3.0",
-        "@univerjs/shared": "workspace:*",
-        "esbuild": "^0.23.0",
-        "esbuild-plugin-clean": "^1.0.1",
-        "esbuild-plugin-copy": "^2.1.1",
-        "esbuild-plugin-vue3": "^0.4.2",
-        "esbuild-style-plugin": "^1.6.3",
-        "less": "^4.2.0",
-        "minimist": "^1.2.8",
-        "typescript": "^5.5.3"
+    "univerSpace": {
+        ".": {
+            "import": "./lib/es/index.js",
+            "require": "./lib/cjs/index.js",
+            "types": "./lib/types/index.d.ts"
+        },
+        "./*": {
+            "import": "./lib/es/*",
+            "require": "./lib/cjs/*",
+            "types": "./lib/types/index.d.ts"
+        },
+        "./lib/*": "./lib/*"
     }
 }
