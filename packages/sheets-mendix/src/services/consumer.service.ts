@@ -15,16 +15,17 @@
  */
 
 import type { ICellData, Nullable, Workbook } from '@univerjs/core';
-import { Inject, Injector, IResourceLoaderService, IUniverInstanceService, LifecycleStages, OnLifecycle, UniverInstanceType } from '@univerjs/core';
+import { Disposable, Inject, Injector, IResourceLoaderService, IUniverInstanceService, LifecycleStages, OnLifecycle, UniverInstanceType } from '@univerjs/core';
 import type { ISheetLocation } from '@univerjs/sheets';
 import { INTERCEPTOR_POINT, SheetInterceptorService } from '@univerjs/sheets';
 
 @OnLifecycle(LifecycleStages.Starting, ConsumerService)
-export class ConsumerService {
+export class ConsumerService extends Disposable {
     constructor(
         @Inject(IResourceLoaderService) private _resourceLoaderService: IResourceLoaderService,
         @Inject(IUniverInstanceService) private _univerInstanceService: IUniverInstanceService, @Inject(Injector) private _injector: Injector
     ) {
+        super();
         this._init();
     }
 
@@ -43,7 +44,7 @@ export class ConsumerService {
 
     private _interceptorForCell() {
         const sis = this._injector.get(SheetInterceptorService);
-        sis.intercept(INTERCEPTOR_POINT.CELL_CONTENT, {
+        this.disposeWithMe(sis.intercept(INTERCEPTOR_POINT.CELL_CONTENT, {
             priority: 100,
             handler(_cell, location: ISheetLocation, next: (v: Nullable<ICellData>) => Nullable<ICellData>) {
                 if (location.row === 0 && location.col === 0) {
@@ -61,9 +62,9 @@ export class ConsumerService {
 
                 return next();
             },
-        });
+        }));
 
-        sis.intercept(INTERCEPTOR_POINT.ROW_FILTERED, {
+        this.disposeWithMe(sis.intercept(INTERCEPTOR_POINT.ROW_FILTERED, {
             priority: 100,
             handler(isFilter, location, next) {
                 if (location.row === 8) {
@@ -71,6 +72,6 @@ export class ConsumerService {
                 }
                 return next(isFilter);
             },
-        });
+        }));
     }
 }

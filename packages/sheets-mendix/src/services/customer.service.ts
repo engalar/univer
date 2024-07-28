@@ -14,22 +14,23 @@
  * limitations under the License.
  */
 
-import { Inject, IResourceManagerService, LifecycleStages, OnLifecycle, UniverInstanceType } from '@univerjs/core';
+import { Disposable, Inject, IResourceManagerService, LifecycleStages, OnLifecycle, UniverInstanceType } from '@univerjs/core';
 
 interface IResource { testResource: string }
 
 @OnLifecycle(LifecycleStages.Starting, CustomerService)
-export class CustomerService {
+export class CustomerService extends Disposable {
     private _model: IResource = { testResource: '' };
 
     constructor(
         @Inject(IResourceManagerService) private _resourceManagerService: IResourceManagerService
     ) {
+        super();
         this._init();
     }
 
     private _init() {
-        this._resourceManagerService.registerPluginResource<IResource>({
+        this.disposeWithMe(this._resourceManagerService.registerPluginResource<IResource>({
             toJson: (unitID) => this._toJson(unitID),
             parseJson: (json) => this._parseJson(json),
             pluginName: 'SHEET_CUSTOMERSERVICE_PLUGIN',
@@ -40,7 +41,7 @@ export class CustomerService {
             onUnLoad: (_unitId) => {
                 this._model = { testResource: '' };
             },
-        });
+        }));
     }
 
     private _toJson(_unitID: string) {
