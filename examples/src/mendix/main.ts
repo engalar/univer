@@ -25,12 +25,17 @@ import { UniverSheetsFormulaPlugin } from '@univerjs/sheets-formula';
 import { UniverSheetsUIPlugin } from '@univerjs/sheets-ui';
 import { UniverUIPlugin } from '@univerjs/ui';
 import { UniverDebuggerPlugin } from '@univerjs/debugger';
+import { UniverSheetsSortPlugin } from '@univerjs/sheets-sort';
+import { UniverSheetsSortUIPlugin } from '@univerjs/sheets-sort-ui';
 
 import { SheetsMendixPlugin } from '@engalar/univer-sheets-mendix';
+import { UniverSheetsFilterPlugin } from '@univerjs/sheets-filter';
+import { UniverSheetsFilterUIPlugin } from '@univerjs/sheets-filter-ui';
 import { enUS, zhCN } from '../locales';
 
 const univer = new Univer({
     theme: defaultTheme,
+    locale: LocaleType.EN_US,
     locales: {
         [LocaleType.ZH_CN]: zhCN,
         [LocaleType.EN_US]: enUS,
@@ -65,6 +70,10 @@ univer.registerPlugin(UniverSheetsFormulaPlugin);
 univer.registerPlugin(SheetsMendixPlugin);
 
 univer.registerPlugin(UniverDebuggerPlugin);
+univer.registerPlugin(UniverSheetsSortPlugin);
+univer.registerPlugin(UniverSheetsSortUIPlugin);
+univer.registerPlugin(UniverSheetsFilterPlugin);
+univer.registerPlugin(UniverSheetsFilterUIPlugin);
 univer.createUnit(UniverInstanceType.UNIVER_SHEET, {});
 
 window.univer = univer;

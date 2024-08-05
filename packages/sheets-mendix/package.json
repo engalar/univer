@@ -57,10 +57,6 @@
     },
     "peerDependencies": {
         "@univerjs/core": "workspace:*",
-        "@univerjs/sheets": "workspace:*"
-    },
-    "devDependencies": {
-        "@univerjs/core": "workspace:*",
         "@univerjs/data-validation": "workspace:*",
         "@univerjs/debugger": "workspace:*",
         "@univerjs/design": "workspace:*",
@@ -107,7 +103,9 @@
         "@univerjs/ui": "workspace:*",
         "@univerjs/uni-formula": "workspace:*",
         "@univerjs/uniscript": "workspace:*",
-        "@univerjs/uniui": "workspace:*",
+        "@univerjs/uniui": "workspace:*"
+    },
+    "devDependencies": {
         "@univerjs/vite-plugin": "^0.5.0",
         "@vitest/coverage-istanbul": "^1.6.0",
         "@wendellhu/redi": "0.16.0",

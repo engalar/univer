@@ -14,10 +14,14 @@
  * limitations under the License.
  */
 
-import { Inject, Injector, Plugin, UniverInstanceType } from '@univerjs/core';
+import type { Dependency } from '@univerjs/core';
+import { DependentOn, DesktopLogService, Inject, Injector, Plugin, UniverInstanceType } from '@univerjs/core';
+import { UniverSheetsUIPlugin } from '@univerjs/sheets-ui';
 import { CustomerService } from './services/customer.service';
-import { ConsumerService } from './services/consumer.service';
+import { SheetsMendixDataSourceController } from './controllers/data-source.controller';
+import { MendixViewModel } from './model/mendix-view.model';
 
+@DependentOn(UniverSheetsUIPlugin)
 export class SheetsMendixPlugin extends Plugin {
     static override pluginName = 'SHEETS_MENDIX_PLUGIN';
     static override type = UniverInstanceType.UNIVER_SHEET;
@@ -30,7 +34,18 @@ export class SheetsMendixPlugin extends Plugin {
     }
 
     override onStarting(injector: Injector): void {
-        injector.add([CustomerService]);
-        injector.add([ConsumerService]);
+        this._initDependencies(injector);
+    }
+
+    private _initDependencies(injector: Injector) {
+        const dependencies: Dependency[] = [
+            [CustomerService],
+            [SheetsMendixDataSourceController],
+            [MendixViewModel],
+            [DesktopLogService],
+        ];
+        dependencies.forEach((d) => {
+            injector.add(d);
+        });
     }
 }

@@ -49,6 +49,28 @@
             }
         },
         {
+            "name": "Launch Mendix (Chrome)",
+            "request": "launch",
+            "type": "chrome",
+            "url": "http://localhost:3002",
+            "webRoot": "${workspaceFolder}/examples/mendix/local/",
+            "presentation": {
+                "group": "0_example",
+                "order": 7
+            }
+        },
+        {
+            "name": "Launch Mendix (Edge)",
+            "request": "launch",
+            "type": "msedge",
+            "url": "http://localhost:3002",
+            "webRoot": "${workspaceFolder}/examples/mendix/local/",
+            "presentation": {
+                "group": "0_example",
+                "order": 8
+            }
+        },
+        {
             "name": "Launch Slide (Chrome)",
             "request": "launch",
             "type": "chrome",
@@ -74,7 +96,10 @@
             "type": "node",
             "name": "vscode-jest-tests",
             "request": "launch",
-            "args": ["--runInBand", "--watchAll=false"],
+            "args": [
+                "--runInBand",
+                "--watchAll=false"
+            ],
             "cwd": "${workspaceFolder}",
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen",
@@ -83,6 +108,56 @@
             "windows": {
                 "program": "${workspaceFolder}/node_modules/jest/bin/jest"
             }
+        },
+        {
+            "type": "pwa-msedge",
+            "name": "Launch Microsoft Edge",
+            "request": "launch",
+            "runtimeArgs": [
+                "--remote-debugging-port=9222"
+            ],
+            "url": "d:\\Users\\eg\\.vscode\\extensions\\ms-edgedevtools.vscode-edge-devtools-2.1.5\\out\\startpage\\index.html", // Provide your project's url to finish configuring
+            "presentation": {
+                "hidden": true
+            }
+        },
+        {
+            "type": "pwa-msedge",
+            "name": "Launch Microsoft Edge in headless mode",
+            "request": "launch",
+            "runtimeArgs": [
+                "--headless",
+                "--remote-debugging-port=9222"
+            ],
+            "url": "http://localhost:3002", // Provide your project's url to finish configuring
+            "presentation": {
+                "hidden": true
+            }
+        },
+        {
+            "type": "vscode-edge-devtools.debug",
+            "name": "Open Edge DevTools",
+            "request": "attach",
+            "url": "http://localhost:3002", // Provide your project's url to finish configuring
+            "presentation": {
+                "hidden": true
+            }
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Launch Edge Headless and attach DevTools",
+            "configurations": [
+                "Launch Microsoft Edge in headless mode",
+                "Open Edge DevTools"
+            ]
+        },
+        {
+            "name": "Launch Edge and attach DevTools",
+            "configurations": [
+                "Launch Microsoft Edge",
+                "Open Edge DevTools"
+            ]
         }
     ]
 }

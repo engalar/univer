@@ -16,4 +16,3 @@
 
 export * from './plugin';
 export * from './services/customer.service';
-export * from './services/consumer.service';
