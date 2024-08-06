@@ -15,31 +15,17 @@
  */
 
 import type { IDisposable, IRange, Workbook } from '@univerjs/core';
-import { CommandType, fromCallback, ICommandService, Inject, Injector, RxDisposable, ThemeService } from '@univerjs/core';
+import { ICommandService, Inject, Injector, RxDisposable, ThemeService } from '@univerjs/core';
 import type { IRenderContext, IRenderModule, SpreadsheetSkeleton } from '@univerjs/engine-render';
 import { IRenderManagerService } from '@univerjs/engine-render';
-import type { ISheetCommandSharedParams } from '@univerjs/sheets';
 import { INTERCEPTOR_POINT, SheetInterceptorService } from '@univerjs/sheets';
 import type { FilterModel } from '@univerjs/sheets-filter';
-import { FILTER_MUTATIONS, ReCalcSheetsFilterMutation, RemoveSheetsFilterMutation, SetSheetsFilterCriteriaMutation, SetSheetsFilterRangeMutation, SheetsFilterService } from '@univerjs/sheets-filter';
 import type { SelectionShape } from '@univerjs/sheets-ui';
-import { getCoordByCell, ISheetSelectionRenderService, SheetSkeletonManagerService, SheetsRenderService } from '@univerjs/sheets-ui';
+import { ISheetSelectionRenderService, SheetSkeletonManagerService, SheetsRenderService } from '@univerjs/sheets-ui';
 
-import { filter, map, of, startWith, switchMap, takeUntil, throttleTime } from 'rxjs';
-import type { ISheetsFilterButtonShapeProps } from '../views/widgets/filter-button.shape';
 import { FILTER_ICON_PADDING, FILTER_ICON_SIZE, SheetsFilterButtonShape } from '../views/widgets/filter-button.shape';
 
-const DEFAULT_Z_INDEX = 1000;
-
 const SHEETS_FILTER_BUTTON_Z_INDEX = 5000;
-
-interface ISheetsFilterRenderParams {
-    unitId: string;
-    worksheetId: string;
-    filterModel?: FilterModel;
-    range?: IRange;
-    skeleton: SpreadsheetSkeleton;
-}
 
 export class SheetsMendixRenderController extends RxDisposable implements IRenderModule {
     private _filterRangeShape: SelectionShape | null = null;
@@ -50,7 +36,6 @@ export class SheetsMendixRenderController extends RxDisposable implements IRende
         private readonly _context: IRenderContext<Workbook>,
         @Inject(Injector) private readonly _injector: Injector,
         @Inject(SheetSkeletonManagerService) private readonly _sheetSkeletonManagerService: SheetSkeletonManagerService,
-        @Inject(SheetsFilterService) private readonly _sheetsFilterService: SheetsFilterService,
         @Inject(ThemeService) private readonly _themeService: ThemeService,
         @Inject(SheetInterceptorService) private readonly _sheetInterceptorService: SheetInterceptorService,
         @Inject(SheetsRenderService) private _sheetsRenderService: SheetsRenderService,
@@ -60,88 +45,25 @@ export class SheetsMendixRenderController extends RxDisposable implements IRende
     ) {
         super();
 
-        [
-            SetSheetsFilterRangeMutation,
-            SetSheetsFilterCriteriaMutation,
-            RemoveSheetsFilterMutation,
-            ReCalcSheetsFilterMutation,
-        ].forEach((m) => this.disposeWithMe(this._sheetsRenderService.registerSkeletonChangingMutations(m.id)));
-
-        this._initRenderer();
+        // this._initRenderer();
+        this._renderFirstButton();
     }
 
-    private _initRenderer(): void {
-        // Subscribe to skeleton change and filter model change.
-        this._sheetSkeletonManagerService.currentSkeleton$.pipe(
-            switchMap((skeletonParams) => {
-                if (!skeletonParams) return of(null);
-
-                const { unit: workbook, unitId } = this._context;
-                const worksheetId = workbook.getActiveSheet()?.getSheetId() || '';
-                const filterModel = this._sheetsFilterService.getFilterModel(unitId, worksheetId) ?? undefined;
-                const getParams = (): ISheetsFilterRenderParams => ({
-                    unitId,
-                    worksheetId,
-                    filterModel,
-                    range: filterModel?.getRange(),
-                    skeleton: skeletonParams.skeleton,
-                });
-
-                return fromCallback(this._commandService.onCommandExecuted.bind(this._commandService)).pipe(
-                    filter(([command]) =>
-                        command.type === CommandType.MUTATION
-                        && (command.params as ISheetCommandSharedParams).unitId === workbook.getUnitId()
-                        && FILTER_MUTATIONS.has(command.id)
-                    ),
-                    throttleTime(20, undefined, { leading: false, trailing: true }),
-                    map(getParams),
-                    startWith(getParams()) // must trigger once
-                );
-            }),
-            takeUntil(this.dispose$)
-        ).subscribe((renderParams) => {
-            this._disposeRendering();
-
-            // If there's no filter range, we don't need to render anything.
-            if (!renderParams || !renderParams.range) {
-                return;
-            }
-
-            this._renderButtons(renderParams as Required<ISheetsFilterRenderParams>);
-        });
-    }
-
-    private _renderButtons(params: Required<ISheetsFilterRenderParams>): void {
-        const { range, filterModel, unitId, skeleton, worksheetId } = params;
+    private _renderFirstButton(): void {
+        const { unitId, scene } = this._context;
         const currentRenderer = this._renderManagerService.getRenderById(unitId);
         if (!currentRenderer) {
             return;
         }
-
-        const { scene } = currentRenderer;
-
-        // Push cell contents to leave space for the filter buttons.
-        this._interceptCellContent(params.range);
-
-        // Create filter button shapes.
-        const { startColumn, endColumn, startRow } = range;
-        for (let col = startColumn; col <= endColumn; col++) {
-            const key = `sheets-filter-button-${col}`;
-            const startPosition = getCoordByCell(startRow, col, scene, skeleton);
-            const { startX, startY, endX, endY } = startPosition;
-
+        const skeleton = this._sheetSkeletonManagerService.getCurrentSkeleton();
+        if (skeleton) {
             // Too little space to draw the button, just ignore it.
+            const { startX, startY, endX, endY } = skeleton.getCellByIndex(0, 0);
             const cellWidth = endX - startX;
             const cellHeight = endY - startY;
-            if (cellHeight <= FILTER_ICON_PADDING || cellWidth <= FILTER_ICON_PADDING) {
-                continue;
-            }
-
-            // In other cases we need to draw the button, and we need to take care of the position and clipping.
-            const hasCriteria = !!filterModel.getFilterColumn(col);
             const iconStartX = endX - FILTER_ICON_SIZE - FILTER_ICON_PADDING;
             const iconStartY = endY - FILTER_ICON_SIZE - FILTER_ICON_PADDING;
-            const props: ISheetsFilterButtonShapeProps = {
+            let buttonShape = this._injector.createInstance(SheetsFilterButtonShape, 'key123', {
                 left: iconStartX,
                 top: iconStartY,
                 height: FILTER_ICON_SIZE,
@@ -149,15 +71,27 @@ export class SheetsMendixRenderController extends RxDisposable implements IRende
                 zIndex: SHEETS_FILTER_BUTTON_Z_INDEX,
                 cellHeight,
                 cellWidth,
-                filterParams: { unitId, subUnitId: worksheetId, col, hasCriteria },
-            };
+                filterParams: { unitId, subUnitId: 'xxx', col: 0, hasCriteria: true },
+            });
+            scene.addObject(buttonShape);
+            scene.makeDirty();
 
-            const buttonShape = this._injector.createInstance(SheetsFilterButtonShape, key, props);
-            this._filterButtonShapes.push(buttonShape);
+            setTimeout(() => {
+                buttonShape.dispose();
+                buttonShape = this._injector.createInstance(SheetsFilterButtonShape, 'key123', {
+                    left: iconStartX * 3,
+                    top: iconStartY,
+                    height: FILTER_ICON_SIZE,
+                    width: FILTER_ICON_SIZE,
+                    zIndex: SHEETS_FILTER_BUTTON_Z_INDEX,
+                    cellHeight,
+                    cellWidth,
+                    filterParams: { unitId, subUnitId: 'xxx', col: 0, hasCriteria: true },
+                });
+                scene.addObject(buttonShape);
+                scene.makeDirty();
+            }, 4000);
         }
-
-        scene.addObjects(this._filterButtonShapes);
-        scene.makeDirty();
     }
 
     private _interceptCellContent(range: IRange): void {

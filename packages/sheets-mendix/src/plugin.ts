@@ -17,6 +17,7 @@
 import type { Dependency } from '@univerjs/core';
 import { DependentOn, DesktopLogService, Inject, Injector, Plugin, UniverInstanceType } from '@univerjs/core';
 import { UniverSheetsUIPlugin } from '@univerjs/sheets-ui';
+import { IRenderManagerService } from '@univerjs/engine-render';
 import { CustomerService } from './services/customer.service';
 import { SheetsMendixDataSourceController } from './controllers/data-source.controller';
 import { SheetsMendixRenderController } from './controllers/sheets-mendix-render.controller';
@@ -30,6 +31,7 @@ export class SheetsMendixPlugin extends Plugin {
 
     constructor(
         private readonly _config = {},
+        @IRenderManagerService private readonly _renderManagerSrv: IRenderManagerService,
         @Inject(Injector) override readonly _injector: Injector
     ) {
         super();
@@ -39,6 +41,10 @@ export class SheetsMendixPlugin extends Plugin {
         this._initDependencies(this._injector);
     }
 
+    override onRendered(): void {
+        this._initRenderModules();
+    }
+
     private _initDependencies(injector: Injector) {
         const dependencies: Dependency[] = [
             [CustomerService],
@@ -46,12 +52,19 @@ export class SheetsMendixPlugin extends Plugin {
             [SheetsMendixUIController, {
                 useFactory: () => this._injector.createInstance(SheetsMendixUIController, this._config),
             }],
-            [SheetsMendixRenderController],
             [MendixViewModel],
             [DesktopLogService],
         ];
         dependencies.forEach((d) => {
             injector.add(d);
+        });
+    }
+
+    private _initRenderModules(): void {
+        ([
+            [SheetsMendixRenderController],
+        ] as Dependency[]).forEach((m) => {
+            this._renderManagerSrv.registerRenderModule(UniverInstanceType.UNIVER_SHEET, m);
         });
     }
 }
