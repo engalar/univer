@@ -19,6 +19,8 @@ import { DependentOn, DesktopLogService, Inject, Injector, Plugin, UniverInstanc
 import { UniverSheetsUIPlugin } from '@univerjs/sheets-ui';
 import { CustomerService } from './services/customer.service';
 import { SheetsMendixDataSourceController } from './controllers/data-source.controller';
+import { SheetsMendixRenderController } from './controllers/sheets-mendix-render.controller';
+import { SheetsMendixUIController } from './controllers/sheets-mendix-ui.controller';
 import { MendixViewModel } from './model/mendix-view.model';
 
 @DependentOn(UniverSheetsUIPlugin)
@@ -33,14 +35,18 @@ export class SheetsMendixPlugin extends Plugin {
         super();
     }
 
-    override onStarting(injector: Injector): void {
-        this._initDependencies(injector);
+    override onStarting(): void {
+        this._initDependencies(this._injector);
     }
 
     private _initDependencies(injector: Injector) {
         const dependencies: Dependency[] = [
             [CustomerService],
             [SheetsMendixDataSourceController],
+            [SheetsMendixUIController, {
+                useFactory: () => this._injector.createInstance(SheetsMendixUIController, this._config),
+            }],
+            [SheetsMendixRenderController],
             [MendixViewModel],
             [DesktopLogService],
         ];

@@ -17,9 +17,11 @@
 import type { ICellData, Nullable, Workbook } from '@univerjs/core';
 import { DesktopLogService, Disposable, DisposableCollection, ICommandService, Inject, Injector, IUniverInstanceService, LifecycleStages, ObjectMatrix, OnLifecycle, UniverInstanceType } from '@univerjs/core';
 import type { ISetRangeValuesCommandParams, ISheetLocation } from '@univerjs/sheets';
-import { generateNullCellValue, INTERCEPTOR_POINT, SetRangeValuesCommand, SheetInterceptorService } from '@univerjs/sheets';
+import { INTERCEPTOR_POINT, SetRangeValuesCommand, SheetInterceptorService } from '@univerjs/sheets';
 import { throttleTime } from 'rxjs';
 import { IRenderManagerService } from '@univerjs/engine-render';
+import type { ISetSheetsFilterRangeMutationParams } from '@univerjs/sheets-filter';
+import { SetSheetsFilterRangeMutation } from '@univerjs/sheets-filter';
 import { MendixViewModel } from '../model/mendix-view.model';
 
 @OnLifecycle(LifecycleStages.Rendered, SheetsMendixDataSourceController)

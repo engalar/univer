@@ -105,6 +105,9 @@
         "@univerjs/uniscript": "workspace:*",
         "@univerjs/uniui": "workspace:*"
     },
+    "dependencies": {
+        "rc-virtual-list": "^3.14.5"
+    },
     "devDependencies": {
         "@univerjs/vite-plugin": "^0.5.0",
         "@vitest/coverage-istanbul": "^1.6.0",
